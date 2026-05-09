@@ -409,7 +409,8 @@ def main():
     lbl_cd  = info_label(ctrl, "中心距離:")
 
     state = {"p1": None, "p2": None,
-             "scale": 1.0, "ox": CANVAS_W/2, "oy": CANVAS_H/2}
+             "scale": 1.0, "ox": CANVAS_W/2, "oy": CANVAS_H/2,
+             "pan_x": 0, "pan_y": 0}
 
     def update_gear():
         try:
@@ -506,9 +507,24 @@ def main():
         state["scale"] *= factor
         redraw()
 
+    def on_pan_start(event):
+        state["pan_x"] = event.x
+        state["pan_y"] = event.y
+
+    def on_pan_move(event):
+        dx = event.x - state["pan_x"]
+        dy = event.y - state["pan_y"]
+        state["ox"] += dx
+        state["oy"] += dy
+        state["pan_x"] = event.x
+        state["pan_y"] = event.y
+        redraw()
+
     canvas.bind("<MouseWheel>", on_wheel)
     canvas.bind("<Button-4>",   on_wheel)
     canvas.bind("<Button-5>",   on_wheel)
+    canvas.bind("<ButtonPress-1>",  on_pan_start)
+    canvas.bind("<B1-Motion>",      on_pan_move)
 
     update_gear()
     root.mainloop()
